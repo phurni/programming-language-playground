@@ -23,3 +23,10 @@ binaries to run the different parts of the project.
 * `src`  
 source code of the implementation.
 
+## Interpreter
+
+The first experiment is the language interpreter, execute the `run` script to launch the interpreter,
+pass the language source file as the first argument:
+
+    bin/run example/fib.src
+
