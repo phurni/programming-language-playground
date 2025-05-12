@@ -4,3 +4,5 @@ $:.push(File.join(__dir__, '../src'))
 require 'tokenizer'
 
 tokens = Tokenizer.new(File.read(ARGV[0])).tokenize
+puts tokens.map(&:inspect)
+puts tokens.map(&:value).join(' ')
