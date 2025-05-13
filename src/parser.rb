@@ -3,6 +3,8 @@ module Nodes
   FunctionDefinition = Struct.new(:name, :formal_args, :body)
   Statements = Struct.new(:items)
   FunctionCall = Struct.new(:name, :actual_args)
+  VariableDeclaration = Struct.new(:name)
+  VariableAssignment = Struct.new(:name, :expression)
   VariableReference = Struct.new(:name)
   BinaryOperator = Struct.new(:glyph, :lhs, :rhs)
   IntegerLiteral = Struct.new(:value)
@@ -80,6 +82,10 @@ class Parser
       parse_if
     elsif peek(:while)
       parse_while
+    elsif peek(:var)
+      parse_variable_declaration
+    elsif peek(:identifier) && peek(:equals, 1)
+      parse_variable_assignment
     elsif peek(:identifier) && peek(:opening_paren, 1)
       parse_function_call
     else
@@ -111,6 +117,21 @@ class Parser
     body = parse_statements
 
     While.new(condition, body)
+  end
+
+  def parse_variable_declaration
+    consume(:var)
+    name = consume(:identifier)
+
+    VariableDeclaration.new(name.value)
+  end
+
+  def parse_variable_assignment
+    name = consume(:identifier)
+    consume(:equals)
+    expression = parse_expression
+
+    VariableAssignment.new(name.value, expression)
   end
 
   def parse_function_call
