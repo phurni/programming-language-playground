@@ -2,6 +2,7 @@ module Nodes
   Definitions = Struct.new(:items)
   FunctionDefinition = Struct.new(:name, :formal_args, :body)
   Statements = Struct.new(:items)
+  FunctionCall = Struct.new(:name, :actual_args)
 end
 
 class Parser
@@ -75,5 +76,26 @@ class Parser
     else
       raise RuntimeError.new("Unexpected token found: #{@tokens.first(5)}")
     end
+  end
+
+  def parse_function_call
+    name = consume(:identifier)
+    consume(:opening_paren)
+    args = parse_actual_arguments
+    consume(:closing_paren)
+
+    FunctionCall.new(name.value, args)
+  end
+
+  def parse_actual_arguments
+    args = []
+    if !peek(:closing_paren)
+      args << parse_expression
+      while peek(:comma)
+        consume(:comma)
+        args << parse_expression
+      end
+    end
+    args
   end
 end

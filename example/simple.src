@@ -1,5 +1,6 @@
 fun do_it(first_arg, second_one) {
-
+  other()
+  any_function()
 }
 
 fun other() {
