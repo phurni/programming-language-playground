@@ -28,6 +28,9 @@ class Interpreter
       raise RuntimeError.new("Trying to reference undeclared variable #{node.name}") unless context.has_key?(node.name)
       context[node.name]
 
+    when IntegerLiteral
+      node.value
+
     else
       raise RuntimeError.new("Unexpected node type: #{node.class}")
     end
