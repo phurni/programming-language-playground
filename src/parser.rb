@@ -4,6 +4,7 @@ module Nodes
   Statements = Struct.new(:items)
   FunctionCall = Struct.new(:name, :actual_args)
   VariableReference = Struct.new(:name)
+  BinaryOperator = Struct.new(:glyph, :lhs, :rhs)
   IntegerLiteral = Struct.new(:value)
 end
 
@@ -102,7 +103,7 @@ class Parser
   end
 
   def parse_expression
-    if peek(:integer)
+    expression = if peek(:integer)
       parse_integer_literal
     elsif peek(:identifier) && peek(:opening_paren, 1)
       parse_function_call
@@ -110,6 +111,13 @@ class Parser
       parse_variable_reference
     else
       raise RuntimeError.new("Unexpected token found: #{@tokens.first(5)}")
+    end
+
+    if peek(:binary_operator)
+      operator = consume(:binary_operator)
+      BinaryOperator.new(operator.value, expression, parse_expression)
+    else
+      expression
     end
   end
 

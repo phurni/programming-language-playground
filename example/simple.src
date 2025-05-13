@@ -1,6 +1,6 @@
 fun do_it(first_arg, second_one) {
-  other(100)
-  any_function(some_var, other(99))
+  other(100 + 100)
+  any_function(some_var, other(99) <= second_one)
 }
 
 fun other() {
