@@ -1,3 +1,6 @@
 fun do_it(first_arg, second_one) {
 
 }
+
+fun other() {
+}
