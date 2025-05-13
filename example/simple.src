@@ -4,4 +4,12 @@ fun do_it(first_arg, second_one) {
 }
 
 fun other() {
+  if (1) {
+  }
+  if (some <= calling(99)) {
+    any_function()
+  }
+  else {
+    do_it()
+  }
 }
