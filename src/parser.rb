@@ -1,5 +1,6 @@
 module Nodes
   Statements = Struct.new(:items)
+  FunctionDefinition = Struct.new(:name, :formal_args, :body)
 end
 
 class Parser
@@ -32,6 +33,8 @@ class Parser
     args = parse_formal_arguments
     consume(:closing_paren)
     body = parse_statements
+
+    FunctionDefinition.new(name, args, body)
   end
 
   def parse_formal_arguments
