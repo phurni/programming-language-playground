@@ -15,10 +15,23 @@ class Parser
     token
   end
 
+  def peek(type)
+    @tokens.fetch(0).type == type
+  end
+
   def parse_function_definition
     consume(:fun)
     name = consume(:identifier).value
     consume(:opening_paren)
+    args = parse_formal_arguments
     consume(:closing_paren)
+  end
+
+  def parse_formal_arguments
+    args = []
+    if peek(:identifier)
+      args << consume(:identifier).value
+    end
+    args
   end
 end
