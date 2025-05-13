@@ -46,6 +46,28 @@ class Interpreter
     when IntegerLiteral
       node.value
 
+    when BinaryOperator
+      lhs = run(node.lhs, context)
+      rhs = run(node.rhs, context)
+
+      case node.glyph
+      when '*'  then lhs * rhs
+      when '/'  then lhs / rhs
+      when '%'  then lhs % rhs
+      when '+'  then lhs + rhs
+      when '-'  then lhs - rhs
+
+      when '<'  then lhs < rhs
+      when '<=' then lhs <= rhs
+      when '>'  then lhs > rhs
+      when '>=' then lhs >= rhs
+      when '==' then lhs == rhs
+      when '!=' then lhs == rhs
+
+      else
+        raise RuntimeError.new("Unknown operator #{node.glyph}")
+      end
+
     else
       raise RuntimeError.new("Unexpected node type: #{node.class}")
     end
