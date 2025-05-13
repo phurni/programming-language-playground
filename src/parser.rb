@@ -3,6 +3,8 @@ module Nodes
   FunctionDefinition = Struct.new(:name, :formal_args, :body)
   Statements = Struct.new(:items)
   FunctionCall = Struct.new(:name, :actual_args)
+  VariableReference = Struct.new(:name)
+  IntegerLiteral = Struct.new(:value)
 end
 
 class Parser
@@ -97,5 +99,25 @@ class Parser
       end
     end
     args
+  end
+
+  def parse_expression
+    if peek(:integer)
+      parse_integer_literal
+    elsif peek(:identifier) && peek(:opening_paren, 1)
+      parse_function_call
+    elsif peek(:identifier)
+      parse_variable_reference
+    else
+      raise RuntimeError.new("Unexpected token found: #{@tokens.first(5)}")
+    end
+  end
+
+  def parse_variable_reference
+    VariableReference.new(consume(:identifier).value)
+  end
+
+  def parse_integer_literal
+    IntegerLiteral.new(consume(:integer).value.to_i)
   end
 end
