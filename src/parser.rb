@@ -23,8 +23,8 @@ class Parser
     token
   end
 
-  def peek(type)
-    @tokens.fetch(0).type == type
+  def peek(type, offset = 0)
+    @tokens.fetch(offset).type == type
   end
 
   def empty?
@@ -63,7 +63,17 @@ class Parser
 
   def parse_statements
     consume(:opening_brace)
+    items = []
+    items << parse_statement until peek(:closing_brace)
     consume(:closing_brace)
-    Statements.new([])
+    Statements.new(items)
+  end
+
+  def parse_statement
+    if peek(:identifier) && peek(:opening_paren, 1)
+      parse_function_call
+    else
+      raise RuntimeError.new("Unexpected token found: #{@tokens.first(5)}")
+    end
   end
 end
