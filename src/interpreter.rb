@@ -17,6 +17,9 @@ class Interpreter
       raise RuntimeError.new("Trying to redefine function: #{node.name}") if @functions.has_key?(node.name)
       @functions[node.name] = node
 
+    when Statements
+      node.items.reduce(nil) {|last_value, item| run(item, context) }
+
     when VariableDeclaration
       context[node.name] = nil
 
