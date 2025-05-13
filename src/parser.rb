@@ -16,5 +16,9 @@ class Parser
   end
 
   def parse_function_definition
+    consume(:fun)
+    name = consume(:identifier).value
+    consume(:opening_paren)
+    consume(:closing_paren)
   end
 end
