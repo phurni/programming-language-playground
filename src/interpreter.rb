@@ -5,12 +5,17 @@ class Interpreter
   end
 
   def initialize
+    @functions = {}
   end
 
   def run(node, context)
     case node
     when Definitions
       node.items.each {|item| run(item, context) }
+
+    when FunctionDefinition
+      raise RuntimeError.new("Trying to redefine function: #{node.name}") if @functions.has_key?(node.name)
+      @functions[node.name] = node
 
     else
       raise RuntimeError.new("Unexpected node type: #{node.class}")
