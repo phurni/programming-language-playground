@@ -20,6 +20,14 @@ class Interpreter
     when Statements
       node.items.reduce(nil) {|last_value, item| run(item, context) }
 
+    when FunctionCall
+      function_node = @functions[node.name]
+      raise RuntimeError.new("Trying to call unknown function #{node.name}") unless function_node
+      raise RuntimeError.new("Calling function #{node.name} with #{node.actual_args.size} arguments when #{function_node.formal_args.size} needed") unless node.actual_args.size == function_node.formal_args.size
+
+      new_context = function_node.formal_args.zip(node.actual_args.map {|arg| run(arg, context) }).to_h
+      run(function_node.body, new_context)
+
     when IfElse
       if run(node.condition, context)
         run(node.true_body, context)
