@@ -17,6 +17,9 @@ class Interpreter
       raise RuntimeError.new("Trying to redefine function: #{node.name}") if @functions.has_key?(node.name)
       @functions[node.name] = node
 
+    when VariableDeclaration
+      context[node.name] = nil
+
     else
       raise RuntimeError.new("Unexpected node type: #{node.class}")
     end
