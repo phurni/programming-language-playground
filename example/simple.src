@@ -4,7 +4,7 @@ fun do_it(first_arg, second_one) {
 }
 
 fun other() {
-  if (1) {
+  while (1) {
   }
   if (some <= calling(99)) {
     any_function()

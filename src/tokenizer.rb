@@ -4,6 +4,7 @@ class Tokenizer
     [:var, /\bvar\b/],
     [:if, /\bif\b/],
     [:else, /\belse\b/],
+    [:while, /\bwhile\b/],
 
     [:identifier, /\b[a-zA-Z_]\w*\b/],
     [:integer, /\b\d+\b/],

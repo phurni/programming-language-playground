@@ -7,6 +7,7 @@ module Nodes
   BinaryOperator = Struct.new(:glyph, :lhs, :rhs)
   IntegerLiteral = Struct.new(:value)
   IfElse = Struct.new(:condition, :true_body, :false_body)
+  While = Struct.new(:condition, :body)
 end
 
 class Parser
@@ -77,6 +78,8 @@ class Parser
   def parse_statement
     if peek(:if)
       parse_if
+    elsif peek(:while)
+      parse_while
     elsif peek(:identifier) && peek(:opening_paren, 1)
       parse_function_call
     else
@@ -97,6 +100,17 @@ class Parser
     end
 
     IfElse.new(condition, true_body, false_body)
+  end
+
+  def parse_while
+    consume(:while)
+    consume(:opening_paren)
+    condition = parse_expression
+    consume(:closing_paren)
+
+    body = parse_statements
+
+    While.new(condition, body)
   end
 
   def parse_function_call
