@@ -1,6 +1,7 @@
 module Nodes
-  Statements = Struct.new(:items)
+  Definitions = Struct.new(:items)
   FunctionDefinition = Struct.new(:name, :formal_args, :body)
+  Statements = Struct.new(:items)
 end
 
 class Parser
@@ -11,7 +12,7 @@ class Parser
   end
 
   def parse
-    parse_function_definition
+    parse_definitions
   end
 
   protected
@@ -24,6 +25,17 @@ class Parser
 
   def peek(type)
     @tokens.fetch(0).type == type
+  end
+
+  def empty?
+    @tokens.empty?
+  end
+
+  def parse_definitions
+    items = []
+    items << parse_function_definition until empty?
+
+    Definitions.new(items)
   end
 
   def parse_function_definition
