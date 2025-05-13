@@ -86,10 +86,8 @@ class Parser
       parse_variable_declaration
     elsif peek(:identifier) && peek(:equals, 1)
       parse_variable_assignment
-    elsif peek(:identifier) && peek(:opening_paren, 1)
-      parse_function_call
     else
-      raise RuntimeError.new("Unexpected token found: #{@tokens.first(5)}")
+      parse_expression
     end
   end
 
