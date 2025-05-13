@@ -31,6 +31,10 @@ class Parser
     args = []
     if peek(:identifier)
       args << consume(:identifier).value
+      while peek(:comma)
+        consume(:comma)
+        args << consume(:identifier).value
+      end
     end
     args
   end
