@@ -10,6 +10,7 @@ begin
   tree = Parser.new(tokens).parse
   interpreter = Interpreter.new
   interpreter.run(tree, {})
+  interpreter.run(Nodes::FunctionCall.new('main', []), {})
 rescue Interpreter::RuntimeError => e
   STDERR.puts "Runtime Error: #{e.message}"
 end
