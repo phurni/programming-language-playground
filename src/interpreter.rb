@@ -20,6 +20,14 @@ class Interpreter
     when VariableDeclaration
       context[node.name] = nil
 
+    when VariableAssignment
+      raise RuntimeError.new("Trying to assign undeclared variable #{node.name}") unless context.has_key?(node.name)
+      context[node.name] = run(node.expression, context)
+
+    when VariableReference
+      raise RuntimeError.new("Trying to reference undeclared variable #{node.name}") unless context.has_key?(node.name)
+      context[node.name]
+
     else
       raise RuntimeError.new("Unexpected node type: #{node.class}")
     end
