@@ -6,6 +6,7 @@ class Interpreter
 
   def initialize
     @functions = {}
+    add_primitives
   end
 
   def run(node, context)
@@ -76,8 +77,17 @@ class Interpreter
         raise RuntimeError.new("Unknown operator #{node.glyph}")
       end
 
+    when Proc
+      node.call(context)
+
     else
       raise RuntimeError.new("Unexpected node type: #{node.class}")
     end
+  end
+
+  protected
+
+  def add_primitives
+    @functions['print'] = FunctionDefinition.new('print', ['value'], lambda {|context| puts context['value'] })
   end
 end
