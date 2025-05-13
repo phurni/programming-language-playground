@@ -1,4 +1,10 @@
+module Nodes
+  Statements = Struct.new(:items)
+end
+
 class Parser
+  include Nodes
+
   def initialize(tokens)
     @tokens = tokens
   end
@@ -25,6 +31,7 @@ class Parser
     consume(:opening_paren)
     args = parse_formal_arguments
     consume(:closing_paren)
+    body = parse_statements
   end
 
   def parse_formal_arguments
@@ -37,5 +44,11 @@ class Parser
       end
     end
     args
+  end
+
+  def parse_statements
+    consume(:opening_brace)
+    consume(:closing_brace)
+    Statements.new([])
   end
 end
