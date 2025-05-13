@@ -5,7 +5,11 @@ require 'tokenizer'
 require 'parser'
 require 'interpreter'
 
-tokens = Tokenizer.new(File.read(ARGV[0])).tokenize
-tree = Parser.new(tokens).parse
-interpreter = Interpreter.new
-interpreter.run(tree, {})
+begin
+  tokens = Tokenizer.new(File.read(ARGV[0])).tokenize
+  tree = Parser.new(tokens).parse
+  interpreter = Interpreter.new
+  interpreter.run(tree, {})
+rescue Interpreter::RuntimeError => e
+  STDERR.puts "Runtime Error: #{e.message}"
+end
