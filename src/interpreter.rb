@@ -20,6 +20,18 @@ class Interpreter
     when Statements
       node.items.reduce(nil) {|last_value, item| run(item, context) }
 
+    when IfElse
+      if run(node.condition, context)
+        run(node.true_body, context)
+      else
+        run(node.false_body, context) if node.false_body
+      end
+
+    when While
+      while run(node.condition, context)
+        run(node.body, context)
+      end
+
     when VariableDeclaration
       context[node.name] = nil
 
