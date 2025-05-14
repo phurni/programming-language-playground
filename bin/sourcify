@@ -1,0 +1,56 @@
+#!/usr/bin/env ruby
+$:.push(File.join(__dir__, '../src'))
+
+require 'tokenizer'
+require 'parser'
+
+def indent(level)
+  '  ' * level
+end
+
+def sourcify(node, indent_level = 0)
+  case node
+  when Nodes::Definitions, Nodes::Statements
+    node.items.map {|item| sourcify(item, indent_level) }.join("\n")
+
+  when Nodes::FunctionDefinition
+    "#{indent(indent_level)}fun %s(%s) {\n%s\n#{indent(indent_level)}}\n" % [node.name, node.formal_args.join(", "), sourcify(node.body, indent_level+1)]
+
+  when Nodes::FunctionCall
+    "#{indent(indent_level)}%s(%s)" % [node.name, node.actual_args.map {|arg| sourcify(arg) }.join(", ")]
+
+  when Nodes::VariableDeclaration
+    "#{indent(indent_level)}var %s" % node.name
+
+  when Nodes::VariableAssignment
+    "#{indent(indent_level)}%s = %s" % [node.name, sourcify(node.expression)]
+
+  when Nodes::VariableReference
+    "#{indent(indent_level)}%s" % node.name
+
+  when Nodes::IntegerLiteral
+    "#{indent(indent_level)}%s" % node.value.to_s
+
+  when Nodes::IfElse
+    output = "#{indent(indent_level)}if (%s) {\n%s\n#{indent(indent_level)}}" % [sourcify(node.condition), sourcify(node.true_body, indent_level+1)]
+    output << "\n#{indent(indent_level)}else {\n%s\n#{indent(indent_level)}}" % sourcify(node.false_body, indent_level+1) if node.false_body
+    output
+
+  when Nodes::While
+    output = "#{indent(indent_level)}while (%s) {\n%s\n#{indent(indent_level)}}" % [sourcify(node.condition), sourcify(node.body, indent_level+1)]
+
+  when Nodes::BinaryOperator
+    "#{indent(indent_level)}%s %s %s" % [sourcify(node.lhs), node.glyph, sourcify(node.rhs)]
+
+  else
+    raise RuntimeError.new("Unexpected node type: #{node.class}")
+  end
+end
+
+begin
+  tokens = Tokenizer.new(File.read(ARGV[0])).tokenize
+  tree = Parser.new(tokens).parse
+  puts sourcify(tree)
+rescue
+  STDERR.puts "#{$!.class}: #{$!.message}"
+end
