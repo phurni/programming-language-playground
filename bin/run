@@ -10,7 +10,7 @@ begin
   tree = Parser.new(tokens).parse
   interpreter = Interpreter.new
   interpreter.run(tree, {})
-  interpreter.run(Nodes::FunctionCall.new('main', []), {})
+  interpreter.run(Nodes::FunctionCall.new(nil, 'main', []), {})
 rescue CodeError => e
   STDERR.puts "#{e.class}: #{e.message}"
 end

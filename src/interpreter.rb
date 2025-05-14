@@ -90,6 +90,6 @@ class Interpreter
   protected
 
   def add_primitives
-    @functions['print'] = FunctionDefinition.new('print', ['value'], lambda {|context| puts context['value'] })
+    @functions['print'] = FunctionDefinition.new(nil, 'print', ['value'], lambda {|context| puts context['value'] })
   end
 end
