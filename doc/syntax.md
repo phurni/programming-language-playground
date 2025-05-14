@@ -102,6 +102,14 @@ else {
 }
 ```
 
+### while
+
+```
+while ([expression]) {
+  [statements]
+}
+```
+
 ## statements
 
 Multiple statements of the following:
