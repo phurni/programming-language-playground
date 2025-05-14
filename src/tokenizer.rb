@@ -23,17 +23,19 @@ class Tokenizer
     [:equals, /=/],
   ]
 
-  Token = Struct.new(:type, :value)
+  Token = Struct.new(:source_location, :type, :value)
 
-  def initialize(code)
-    @code = code.strip
+  def initialize(code, filename = nil)
+    @code = code.rstrip
     @tokens = []
+    @filename = filename.freeze
+    @line_number = 1 + @code.slice!(/\A(\s*)/).count("\n")
   end
 
   def tokenize
     until @code.empty?
       @tokens << find_token
-      @code.lstrip!
+      @line_number += @code.slice!(/\A(\s*)/).count("\n")
     end
     @tokens
   end
@@ -43,10 +45,10 @@ class Tokenizer
   def find_token
     TOKEN_TYPES.each do |type, re|
       if value = @code.slice!(/\A(#{re})/)
-        return Token.new(type, value.strip)
+        return Token.new(SourceLocation.new(@filename, @line_number), type, value.strip)
       end
     end
 
-    raise SyntaxError.new("Could not match token near: #{@code[/.*/]}")
+    raise SyntaxError.new(SourceLocation.new(@filename, @line_number), "Could not match token near: #{@code[/.*/]}")
   end
 end

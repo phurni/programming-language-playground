@@ -27,7 +27,7 @@ def stringify(node, indent_level = 0)
 end
 
 begin
-  tokens = Tokenizer.new(File.read(ARGV[0])).tokenize
+  tokens = Tokenizer.new(File.read(ARGV[0]), ARGV[0]).tokenize
   tree = Parser.new(tokens).parse
   puts stringify(tree)
 rescue CodeError => e

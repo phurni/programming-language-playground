@@ -6,7 +6,7 @@ require 'parser'
 require 'interpreter'
 
 begin
-  tokens = Tokenizer.new(File.read(ARGV[0])).tokenize
+  tokens = Tokenizer.new(File.read(ARGV[0]), ARGV[0]).tokenize
   tree = Parser.new(tokens).parse
   interpreter = Interpreter.new
   interpreter.run(tree, {})
