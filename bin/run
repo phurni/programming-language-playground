@@ -11,6 +11,6 @@ begin
   interpreter = Interpreter.new
   interpreter.run(tree, {})
   interpreter.run(Nodes::FunctionCall.new('main', []), {})
-rescue Interpreter::RuntimeError => e
-  STDERR.puts "Runtime Error: #{e.message}"
+rescue CodeError => e
+  STDERR.puts "#{e.class}: #{e.message}"
 end

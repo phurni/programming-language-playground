@@ -1,0 +1,2 @@
+class CodeError < StandardError
+end

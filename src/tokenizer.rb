@@ -1,4 +1,9 @@
+require_relative 'common'
+
 class Tokenizer
+  class SyntaxError < CodeError
+  end
+
   TOKEN_TYPES = [
     [:fun, /\bfun\b/],
     [:var, /\bvar\b/],
@@ -42,6 +47,6 @@ class Tokenizer
       end
     end
 
-    raise RuntimeError.new("Could not match token near: #{@code[/.*/]}")
+    raise SyntaxError.new("Could not match token near: #{@code[/.*/]}")
   end
 end

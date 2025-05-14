@@ -43,7 +43,7 @@ def sourcify(node, indent_level = 0)
     "#{indent(indent_level)}%s %s %s" % [sourcify(node.lhs), node.glyph, sourcify(node.rhs)]
 
   else
-    raise RuntimeError.new("Unexpected node type: #{node.class}")
+    raise CodeError.new("Unexpected node type: #{node.class}")
   end
 end
 
@@ -51,6 +51,6 @@ begin
   tokens = Tokenizer.new(File.read(ARGV[0])).tokenize
   tree = Parser.new(tokens).parse
   puts sourcify(tree)
-rescue
-  STDERR.puts "#{$!.class}: #{$!.message}"
+rescue CodeError => e
+  STDERR.puts "#{e.class}: #{e.message}"
 end

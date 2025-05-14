@@ -1,3 +1,5 @@
+require_relative 'common'
+
 module Nodes
   Definitions = Struct.new(:items)
   FunctionDefinition = Struct.new(:name, :formal_args, :body)
@@ -15,6 +17,9 @@ end
 class Parser
   include Nodes
 
+  class ParseError < CodeError
+  end
+
   def initialize(tokens)
     @tokens = tokens
   end
@@ -27,7 +32,7 @@ class Parser
 
   def consume(type)
     token = @tokens.shift
-    raise RuntimeError.new("Expected token type #{type}, but got #{token.type}\nNext tokens: #{@tokens.first(5)}") unless token.type == type
+    raise ParseError.new("Expected token type #{type}, but got #{token.type}") unless token.type == type
     token
   end
 
@@ -161,7 +166,7 @@ class Parser
     elsif peek(:identifier)
       parse_variable_reference
     else
-      raise RuntimeError.new("Unexpected token found: #{@tokens.first(5)}")
+      raise ParseError.new("Unexpected token found: #{@tokens.first}")
     end
 
     if peek(:binary_operator)

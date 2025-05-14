@@ -1,7 +1,9 @@
+require_relative 'common'
+
 class Interpreter
   include Nodes
 
-  class RuntimeError < StandardError
+  class RuntimeError < CodeError
   end
 
   def initialize
