@@ -1,17 +1,17 @@
 require_relative 'common'
 
 module Nodes
-  Definitions = Struct.new(:items)
-  FunctionDefinition = Struct.new(:name, :formal_args, :body)
-  Statements = Struct.new(:items)
-  FunctionCall = Struct.new(:name, :actual_args)
-  VariableDeclaration = Struct.new(:name)
-  VariableAssignment = Struct.new(:name, :expression)
-  VariableReference = Struct.new(:name)
-  BinaryOperator = Struct.new(:glyph, :lhs, :rhs)
-  IntegerLiteral = Struct.new(:value)
-  IfElse = Struct.new(:condition, :true_body, :false_body)
-  While = Struct.new(:condition, :body)
+  Definitions = Struct.new(:source_location, :items)
+  FunctionDefinition = Struct.new(:source_location, :name, :formal_args, :body)
+  Statements = Struct.new(:source_location, :items)
+  FunctionCall = Struct.new(:source_location, :name, :actual_args)
+  VariableDeclaration = Struct.new(:source_location, :name)
+  VariableAssignment = Struct.new(:source_location, :name, :expression)
+  VariableReference = Struct.new(:source_location, :name)
+  BinaryOperator = Struct.new(:source_location, :glyph, :lhs, :rhs)
+  IntegerLiteral = Struct.new(:source_location, :value)
+  IfElse = Struct.new(:source_location, :condition, :true_body, :false_body)
+  While = Struct.new(:source_location, :condition, :body)
 end
 
 class Parser
@@ -32,7 +32,7 @@ class Parser
 
   def consume(type)
     token = @tokens.shift
-    raise ParseError.new("Expected token type #{type}, but got #{token.type}") unless token.type == type
+    raise ParseError.new(token.source_location, "Expected token type #{type}, but got #{token.type}") unless token.type == type
     token
   end
 
@@ -48,18 +48,18 @@ class Parser
     items = []
     items << parse_function_definition until empty?
 
-    Definitions.new(items)
+    Definitions.new(nil, items)
   end
 
   def parse_function_definition
-    consume(:fun)
+    keyword = consume(:fun)
     name = consume(:identifier).value
     consume(:opening_paren)
     args = parse_formal_arguments
     consume(:closing_paren)
     body = parse_statements
 
-    FunctionDefinition.new(name, args, body)
+    FunctionDefinition.new(keyword.source_location, name, args, body)
   end
 
   def parse_formal_arguments
@@ -75,11 +75,11 @@ class Parser
   end
 
   def parse_statements
-    consume(:opening_brace)
+    token = consume(:opening_brace)
     items = []
     items << parse_statement until peek(:closing_brace)
     consume(:closing_brace)
-    Statements.new(items)
+    Statements.new(token.source_location, items)
   end
 
   def parse_statement
@@ -97,7 +97,7 @@ class Parser
   end
 
   def parse_if
-    consume(:if)
+    keyword = consume(:if)
     consume(:opening_paren)
     condition = parse_expression
     consume(:closing_paren)
@@ -108,25 +108,25 @@ class Parser
       parse_statements
     end
 
-    IfElse.new(condition, true_body, false_body)
+    IfElse.new(keyword.source_location, condition, true_body, false_body)
   end
 
   def parse_while
-    consume(:while)
+    keyword = consume(:while)
     consume(:opening_paren)
     condition = parse_expression
     consume(:closing_paren)
 
     body = parse_statements
 
-    While.new(condition, body)
+    While.new(keyword.source_location, condition, body)
   end
 
   def parse_variable_declaration
     consume(:var)
     name = consume(:identifier)
 
-    VariableDeclaration.new(name.value)
+    VariableDeclaration.new(name.source_location, name.value)
   end
 
   def parse_variable_assignment
@@ -134,7 +134,7 @@ class Parser
     consume(:equals)
     expression = parse_expression
 
-    VariableAssignment.new(name.value, expression)
+    VariableAssignment.new(name.source_location, name.value, expression)
   end
 
   def parse_function_call
@@ -143,7 +143,7 @@ class Parser
     args = parse_actual_arguments
     consume(:closing_paren)
 
-    FunctionCall.new(name.value, args)
+    FunctionCall.new(name.source_location, name.value, args)
   end
 
   def parse_actual_arguments
@@ -166,22 +166,24 @@ class Parser
     elsif peek(:identifier)
       parse_variable_reference
     else
-      raise ParseError.new("Unexpected token found: #{@tokens.first}")
+      raise ParseError.new(@tokens.first.source_location, "Unexpected token found: #{@tokens.first}")
     end
 
     if peek(:binary_operator)
       operator = consume(:binary_operator)
-      BinaryOperator.new(operator.value, expression, parse_expression)
+      BinaryOperator.new(operator.source_location, operator.value, expression, parse_expression)
     else
       expression
     end
   end
 
   def parse_variable_reference
-    VariableReference.new(consume(:identifier).value)
+    name = consume(:identifier)
+    VariableReference.new(name.source_location, name.value)
   end
 
   def parse_integer_literal
-    IntegerLiteral.new(consume(:integer).value.to_i)
+    literal = consume(:integer)
+    IntegerLiteral.new(literal.source_location, literal.value.to_i)
   end
 end
