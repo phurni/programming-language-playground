@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+$:.push(File.join(__dir__, '../src'))
+
+require 'tokenizer'
+require 'parser'
+
+def stringify(node, indent_level = 0)
+  case node.class.name
+  when /^Nodes::(Definitions|Statements)/
+    node.items.map {|item| stringify(item, indent_level) }.join("\n")
+
+  when /^Nodes::(.+)/
+    class_name = $1
+    node_attrs, plain_attrs = node.each_pair.partition {|_, value| value.class.name =~ /^Nodes::/ || (value.is_a?(Array) && value.first.class.name =~ /^Nodes::/) }
+    [
+      "#{'  '*indent_level}<#{class_name}>",
+      plain_attrs.map {|name, value| "#{'  '*(indent_level+1)}#{name}: #{value}" }.join("\n"),
+      node_attrs.map {|name, value| "#{'  '*(indent_level+1)}#{name}:\n#{stringify(value, indent_level+2)}" }.join("\n")
+    ].reject(&:empty?).join("\n")
+
+  when /^Array/
+    node.map {|item| stringify(item, indent_level) }.join("\n")
+
+  else
+    raise RuntimeError.new("Unexpected node type: #{node.class}")
+  end
+end
+
+begin
+  tokens = Tokenizer.new(File.read(ARGV[0])).tokenize
+  tree = Parser.new(tokens).parse
+  puts stringify(tree)
+rescue
+  STDERR.puts "#{$!.class}: #{$!.message}"
+end
