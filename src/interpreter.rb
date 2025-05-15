@@ -43,6 +43,13 @@ class Interpreter
   end
 
   def run(node, context)
+    value = nil
+    next_node = node
+
+    while next_node
+      node = next_node
+      next_node = node.next
+
     case node
     when Definitions
       node.items.each {|item| run(item, context) }
@@ -116,6 +123,9 @@ class Interpreter
     else
       raise RuntimeError.new("Unexpected node type: #{node.class}")
     end
+    end
+
+    value
   end
 
   protected
