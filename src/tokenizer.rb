@@ -10,6 +10,7 @@ class Tokenizer
     [:if, /\bif\b/],
     [:else, /\belse\b/],
     [:while, /\bwhile\b/],
+    [:return, /\breturn\b/],
 
     [:identifier, /\b[a-zA-Z_]\w*\b/],
     [:integer, /\b\d+\b/],

@@ -5,6 +5,7 @@ module Nodes
   FunctionDefinition = Struct.new(:source_location, :name, :formal_args, :body)
   Statements = Struct.new(:source_location, :items)
   FunctionCall = Struct.new(:source_location, :name, :actual_args)
+  FunctionReturn = Struct.new(:source_location, :expression)
   VariableDeclaration = Struct.new(:source_location, :name)
   VariableAssignment = Struct.new(:source_location, :name, :expression)
   VariableReference = Struct.new(:source_location, :name)
@@ -89,6 +90,8 @@ class Parser
       parse_while
     elsif peek(:var)
       parse_variable_declaration
+    elsif peek(:return)
+      parse_return
     elsif peek(:identifier) && peek(:equals, 1)
       parse_variable_assignment
     else
@@ -144,6 +147,13 @@ class Parser
     consume(:closing_paren)
 
     FunctionCall.new(name.source_location, name.value, args)
+  end
+
+  def parse_return
+    keyword = consume(:return)
+    expression = parse_expression
+
+    FunctionReturn.new(keyword.source_location, expression)
   end
 
   def parse_actual_arguments
