@@ -10,6 +10,7 @@ class Interpreter
   end
 
   def initialize
+    @stack = []
     @functions = {}
     add_primitives
   end
@@ -32,6 +33,11 @@ class Interpreter
     when FunctionCall
       new_node = promote_node(node)
       new_node.actual_args = node.actual_args.map {|arg| compile(arg) }
+      new_node
+
+    when FunctionReturn
+      new_node = promote_node(node)
+      new_node.expression = compile(node.expression)
       new_node
 
     when VariableDeclaration, VariableReference, IntegerLiteral
@@ -57,7 +63,15 @@ class Interpreter
         raise RuntimeError.new(node.source_location, "Calling function #{node.name} with #{node.actual_args.size} arguments when #{function_node.formal_args.size} needed") unless node.actual_args.size == function_node.formal_args.size
 
         new_context = function_node.formal_args.zip(node.actual_args.map {|arg| run(arg, context) }).to_h
-        run(function_node.body, new_context)
+        context['@next'] = node.next
+        @stack.push(context)
+        context = new_context
+        next_node = function_node.body
+
+      when FunctionReturn
+        value = run(node.expression, context)
+        context = @stack.pop
+        next_node = context['@next']
 
       when VariableDeclaration
         context[node.name] = nil
@@ -109,7 +123,7 @@ class Interpreter
   protected
 
   def add_primitives
-    @functions['print'] = FunctionDefinition.new(nil, 'print', ['value'], promote_node(lambda {|context| puts context['value'] }))
+    @functions['print'] = FunctionDefinition.new(nil, 'print', ['value'], promote_node(FunctionReturn.new(nil, promote_node(lambda {|context| puts context['value'] }))))
   end
 
   module NodeLink
