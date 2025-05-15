@@ -54,6 +54,18 @@ class Interpreter
     when VariableDeclaration, VariableReference, IntegerLiteral
       promote_node(node)
 
+    when IfElse
+      new_node = promote_node(node)
+      new_node.condition = compile(node.condition)
+      new_node.true_body = compile(node.true_body)
+      new_node.false_body = compile(node.false_body) if node.false_body
+      def new_node.next=(target)
+        self.false_body.last_next = target if self.false_body
+        self.true_body.last_next = target
+        @next = target
+      end
+      new_node
+
     when While
       new_node = promote_node(node)
       new_node.condition = compile(node.condition)
@@ -125,6 +137,13 @@ class Interpreter
 
         else
           raise RuntimeError.new(node.source_location, "Unknown operator #{node.glyph}")
+        end
+
+      when IfElse
+        if run(node.condition, context)
+          next_node = node.true_body
+        elsif node.false_body
+          next_node = node.false_body
         end
 
       when While
