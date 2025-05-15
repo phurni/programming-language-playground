@@ -94,8 +94,10 @@ class Parser
       parse_return
     elsif peek(:identifier) && peek(:equals, 1)
       parse_variable_assignment
+    elsif peek(:identifier) && peek(:opening_paren, 1)
+      parse_function_call
     else
-      parse_expression
+      raise ParseError.new(@tokens.first.source_location, "Unexpected token found: #{@tokens.first}")
     end
   end
 
