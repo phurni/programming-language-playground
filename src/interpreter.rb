@@ -54,6 +54,13 @@ class Interpreter
     when VariableDeclaration, VariableReference, IntegerLiteral
       promote_node(node)
 
+    when While
+      new_node = promote_node(node)
+      new_node.condition = compile(node.condition)
+      new_node.body = compile(node.body)
+      new_node.body.last_next = new_node
+      new_node
+
     else
       raise CompilationError.new("Unexpected node type: #{node.class}")
     end
@@ -120,6 +127,11 @@ class Interpreter
           raise RuntimeError.new(node.source_location, "Unknown operator #{node.glyph}")
         end
 
+      when While
+        if run(node.condition, context)
+          next_node = node.body
+        end
+
       when Proc
         value = node.call(context)
 
@@ -139,6 +151,12 @@ class Interpreter
 
   module NodeLink
     attr_accessor :next
+
+    def last_next=(target)
+      last_node = self
+      last_node = last_node.next while last_node&.next
+      last_node.next = target
+    end
   end
 
   def promote_node(node)

@@ -1,0 +1,15 @@
+fun count_to(upper_value) {
+  var counter
+  counter = 1
+  while (counter <= upper_value) {
+    print(counter)
+    counter = counter + 1
+  }
+  return 0
+}
+
+fun main() {
+  print(100)
+  count_to(3)
+  print(200)
+}
