@@ -109,7 +109,7 @@ class Interpreter
   protected
 
   def add_primitives
-    @functions['print'] = FunctionDefinition.new(nil, 'print', ['value'], lambda {|context| puts context['value'] })
+    @functions['print'] = FunctionDefinition.new(nil, 'print', ['value'], promote_node(lambda {|context| puts context['value'] }))
   end
 
   module NodeLink
