@@ -6,10 +6,14 @@ class Interpreter
   class RuntimeError < CodeError
   end
 
+  class StackOverflowError < RuntimeError
+  end
+
   class CompilationError < CodeError
   end
 
-  def initialize
+  def initialize(stack_max_depth: 1000)
+    @stack_max_depth = stack_max_depth
     @stack = []
     @functions = {}
     add_primitives
@@ -89,6 +93,8 @@ class Interpreter
 
       case node
       when FunctionCall
+        raise StackOverflowError.new(node.source_location, "Stack max depth reached (#{@stack_max_depth}) when calling function #{node.name}") if @stack.size > @stack_max_depth
+
         function_node = @functions[node.name]
         raise RuntimeError.new(node.source_location, "Trying to call unknown function #{node.name}") unless function_node
         raise RuntimeError.new(node.source_location, "Calling function #{node.name} with #{node.actual_args.size} arguments when #{function_node.formal_args.size} needed") unless node.actual_args.size == function_node.formal_args.size
