@@ -42,8 +42,6 @@ fun name(arg1, arg2) {
 }
 ```
 
-The last executed statement in the function is its return value.
-
 ## expression
 
 One expression of the following:
@@ -125,3 +123,8 @@ Multiple statements of the following:
 ### [control structures]
 
 ### [function call]
+
+### function return
+
+`return [expression]`
+

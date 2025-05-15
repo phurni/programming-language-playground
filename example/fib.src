@@ -1,13 +1,13 @@
 fun fibonacci(n) {
   if (n == 0) {
-    n
+    return n
   }
   else {
     if (n == 1) {
-      n 
+      return n 
     }
     else {
-      fibonacci(n - 1) + fibonacci(n - 2)
+      return fibonacci(n - 1) + fibonacci(n - 2)
     }
   }
 }
