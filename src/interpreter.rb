@@ -23,6 +23,7 @@ class Interpreter
     when FunctionDefinition
       raise CompilationError.new(node.source_location, "Trying to redefine function: #{node.name}") if @functions.has_key?(node.name)
       node.body = compile(node.body)
+      node.body.last_next = compile(FunctionReturn.new(node.body.source_location, IntegerLiteral.new(node.body.source_location, 0)))
       @functions[node.name] = node
 
     when Statements
