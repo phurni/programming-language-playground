@@ -30,3 +30,9 @@ pass the language source file as the first argument:
 
     bin/run example/fib.src
 
+Under the `interpreter-v1` git tag, you'll find the first runnable version of the interpreter which consists
+of the `Tokenizer`, `Parser` and `Interpreter`.
+
+Under the `interpreter-v2` git tag, you'll find the same implementation as the `interpreter-v1` but with error
+reports indicating the source filename and line number. It also includes tools to print the AbstractSyntaxTree
+and to reformat the source code (reprints the source from the AST).
