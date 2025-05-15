@@ -9,8 +9,8 @@ begin
   tokens = Tokenizer.new(File.read(ARGV[0]), ARGV[0]).tokenize
   tree = Parser.new(tokens).parse
   interpreter = Interpreter.new
-  interpreter.run(tree, {})
-  interpreter.run(Nodes::FunctionCall.new(nil, 'main', []), {})
+  interpreter.compile(tree)
+  interpreter.run(interpreter.compile(Nodes::FunctionCall.new(nil, 'main', [])), {})
 rescue CodeError => e
   STDERR.puts "#{e.class}: #{e.message}"
 end

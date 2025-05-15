@@ -6,9 +6,40 @@ class Interpreter
   class RuntimeError < CodeError
   end
 
+  class CompilationError < CodeError
+  end
+
   def initialize
     @functions = {}
     add_primitives
+  end
+
+  def compile(node)
+    case node
+    when Definitions
+      node.items.each {|item| compile(item) }
+
+    when FunctionDefinition
+      raise CompilationError.new(node.source_location, "Trying to redefine function: #{node.name}") if @functions.has_key?(node.name)
+      node.body = compile(node.body)
+      @functions[node.name] = node
+
+    when Statements
+      nodes = node.items.map {|item| compile(item) }
+      nodes.each_cons(2) {|first, second| first.next = second }
+      nodes.first
+
+    when FunctionCall
+      new_node = promote_node(node)
+      new_node.actual_args = node.actual_args.map {|arg| compile(arg) }
+      new_node
+
+    when VariableDeclaration, VariableReference, IntegerLiteral
+      promote_node(node)
+
+    else
+      raise CompilationError.new("Unexpected node type: #{node.class}")
+    end
   end
 
   def run(node, context)
@@ -91,5 +122,13 @@ class Interpreter
 
   def add_primitives
     @functions['print'] = FunctionDefinition.new(nil, 'print', ['value'], lambda {|context| puts context['value'] })
+  end
+
+  module NodeLink
+    attr_accessor :next
+  end
+
+  def promote_node(node)
+    node.extend(NodeLink)
   end
 end
