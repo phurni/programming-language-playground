@@ -40,6 +40,17 @@ class Interpreter
       new_node.expression = compile(node.expression)
       new_node
 
+    when VariableAssignment
+      new_node = promote_node(node)
+      new_node.expression = compile(node.expression)
+      new_node
+
+    when BinaryOperator
+      new_node = promote_node(node)
+      new_node.lhs = compile(node.lhs)
+      new_node.rhs = compile(node.rhs)
+      new_node
+
     when VariableDeclaration, VariableReference, IntegerLiteral
       promote_node(node)
 
